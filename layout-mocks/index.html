@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Couchette — Maquettes layout vitre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1410;
+      --paper: #f5f0e8;
+      --night: #080b10;
+      --ember: #c45c2a;
+      --font-display: "Fraunces", Georgia, serif;
+      --font: "DM Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--paper);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      padding: clamp(2rem, 6vw, 4rem) clamp(1.25rem, 4vw, 3rem);
+      max-width: 42rem;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 2.35rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+    .lead {
+      margin: 0.85rem 0 0;
+      color: rgba(26, 20, 16, 0.62);
+      line-height: 1.55;
+      font-size: 0.98rem;
+    }
+    .note {
+      margin: 1.5rem 0 0;
+      padding: 0.85rem 1rem;
+      border-left: 2px solid var(--ember);
+      font-size: 0.88rem;
+      color: rgba(26, 20, 16, 0.7);
+      line-height: 1.5;
+    }
+    ol {
+      margin: 2.25rem 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: m;
+    }
+    li {
+      counter-increment: m;
+      margin: 0 0 1.35rem;
+      padding-top: 1.35rem;
+      border-top: 1px solid rgba(26, 20, 16, 0.12);
+    }
+    li a {
+      color: inherit;
+      text-decoration: none;
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+    }
+    li a:hover { color: var(--ember); }
+    li a::before {
+      content: counter(m, decimal-leading-zero) " · ";
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      color: rgba(26, 20, 16, 0.4);
+      font-family: var(--font);
+    }
+    li p {
+      margin: 0.4rem 0 0;
+      font-size: 0.92rem;
+      color: rgba(26, 20, 16, 0.58);
+      line-height: 1.45;
+    }
+    .prio {
+      display: inline-block;
+      margin-left: 0.35rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ember);
+      font-family: var(--font);
+      vertical-align: middle;
+    }
+    footer {
+      margin-top: 2.5rem;
+      font-size: 0.78rem;
+      color: rgba(26, 20, 16, 0.45);
+    }
+    footer a { color: inherit; }
+  </style>
+</head>
+<body>
+  <h1>Maquettes layout · vitre Couchette</h1>
+  <p class="lead">Composition seulement (média option&nbsp;B conservé). Hors scope&nbsp;: progress bar, scrubber, chrome player, stack de labels.</p>
+  <p class="note"><strong>Ordre prés. PM (Marquinhos)</strong> — cinéma plein cadre d’abord, puis asym magazine, puis spread typo.</p>
+  <ol>
+    <li>
+      <a href="02-cinema-bleed.html">Cinéma bleed <span class="prio">PM #1</span></a>
+      <p>Vitré quasi plein viewport ; une route + une accroche en bas. Immersion cinéma.</p>
+    </li>
+    <li>
+      <a href="01-editorial-asym.html">Éditorial asymétrique <span class="prio">#2</span></a>
+      <p>Typo à gauche, vitre ~58&nbsp;% à droite ; asymétrie magazine.</p>
+    </li>
+    <li>
+      <a href="03-spread-type.html">Spread typo <span class="prio">#3</span></a>
+      <p>Display dominant + vitre portrait comme photo de magazine.</p>
+    </li>
+  </ol>
+  <footer>
+    Voir aussi <a href="NOTES.md">NOTES.md</a> · média <code>../media/cabin-night.*</code>
+  </footer>
+</body>
+</html>

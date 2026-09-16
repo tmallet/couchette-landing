@@ -1,7 +1,7 @@
 /**
  * Couchette — Option B cabin-glass editorial media
  * Poster + video loop inside .cabin-media; no WebGL / Quaternius / GLB.
- * Exposes window.COUCHETTE_TRAIN.setProgress for scroll scrub compat.
+ * No scroll scrub — loop autoplay when in view.
  * prefers-reduced-motion → pause video, poster still.
  */
 (function () {
@@ -13,14 +13,9 @@
   var poster = document.getElementById("cabin-poster");
   var fallback = document.getElementById("scene-fallback");
 
-  var targetProgress = 0;
-
   window.COUCHETTE_TRAIN = {
     progress: 0,
-    setProgress: function (t) {
-      targetProgress = Math.max(0, Math.min(1, Number(t) || 0));
-      window.COUCHETTE_TRAIN.progress = targetProgress;
-    },
+    setProgress: function () { /* no-op — Composition 1 has no scrub */ },
     destroy: function () {
       if (video) {
         try {

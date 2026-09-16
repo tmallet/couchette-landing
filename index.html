@@ -32,10 +32,15 @@
   </header>
 
   <main>
-    <!-- 1. Métaphore fenêtre + travelling horizontal (sticky) -->
-    <section class="journey" id="journey" aria-label="Travelling cabine">
-      <div class="journey-sticky">
-        <div class="cabin-frame" aria-hidden="true">
+    <!-- 1. Composition 1 — Éditorial asymétrique (copy ~38% / vitre ~62%, sans chrome player) -->
+    <section class="journey" id="journey" aria-label="Corridor nocturne">
+      <div class="journey-page">
+        <div class="journey-copy">
+          <p class="journey-eyebrow">Corridor nocturne</p>
+          <h1 class="journey-display">Le paysage défile.<br />Vous restez.</h1>
+          <p class="journey-companion">Une nuit européenne, mieux lue avant le billet.</p>
+        </div>
+        <figure class="journey-vitre" aria-label="Vitré cabine">
           <div class="cabin-bevel">
             <div class="cabin-glass">
               <div class="cabin-media" id="cabin-media">
@@ -48,27 +53,13 @@
               </div>
               <div class="scene-fallback" id="scene-fallback" aria-hidden="true"></div>
               <div class="glass-vignette" aria-hidden="true"></div>
-              <div class="glass-reflect"></div>
-              <div class="glass-dirt"></div>
-            </div>
-            <div class="cabin-sill">
-              <span class="sill-label">Vitré · nuit</span>
+              <div class="glass-reflect" aria-hidden="true"></div>
+              <div class="glass-dirt" aria-hidden="true"></div>
             </div>
           </div>
-        </div>
-
-        <div class="journey-captions" aria-live="polite">
-          <p class="journey-kicker">Corridor nocturne</p>
-          <p class="journey-route" id="journey-route" data-routes='["Paris → Strasbourg","Strasbourg → Munich","Munich → Vienne","Vienne → Budapest"]'>Paris → Strasbourg</p>
-          <p class="journey-note" id="journey-note">Le paysage défile. Vous restez.</p>
-        </div>
-
-        <div class="journey-progress" aria-hidden="true">
-          <div class="journey-progress-bar" id="journey-progress-bar"></div>
-        </div>
+          <figcaption class="journey-legend">Paris → Vienne</figcaption>
+        </figure>
       </div>
-      <!-- Hauteur de scrub : scroll vertical → progression train -->
-      <div class="journey-scrub" id="scroll-track" aria-hidden="true"></div>
     </section>
 
     <!-- 2. Intro magazine (papier chaud) — promesse asymétrique -->

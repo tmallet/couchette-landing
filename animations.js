@@ -1,7 +1,8 @@
 /**
- * Couchette v3 — title card + vitre travelling + magazine reveals
- * Scrub #scroll-track → route captions + subtle #cabin-media parallax
- * prefers-reduced-motion: skip Lenis / scrub / fancy reveals
+ * Couchette v3 — Composition 1
+ * Title card + magazine reveals (no journey scrub / #scroll-track)
+ * Optional light vitre parallax on #journey only — no progress bar / route captions
+ * prefers-reduced-motion: skip Lenis / fancy reveals / parallax
  */
 (function () {
   "use strict";
@@ -19,61 +20,11 @@
   var titleCard = document.getElementById("title-card");
   var nav = document.getElementById("site-nav");
   var reveals = document.querySelectorAll("[data-reveal]");
-  var routeEl = document.getElementById("journey-route");
-  var noteEl = document.getElementById("journey-note");
-  var progressBar = document.getElementById("journey-progress-bar");
-  var track = document.getElementById("scroll-track");
+  var journey = document.getElementById("journey");
   var cabinMedia = document.getElementById("cabin-media");
-  var cabinVideo = document.getElementById("cabin-video");
-
-  var ROUTES = ["Paris → Strasbourg", "Strasbourg → Munich", "Munich → Vienne", "Vienne → Budapest"];
-  var NOTES = [
-    "Le paysage défile. Vous restez.",
-    "Les lumières de la ville s’effacent.",
-    "Couloir, couchette, silence.",
-    "À l’aube, une autre gare.",
-  ];
-
-  try {
-    if (routeEl && routeEl.dataset.routes) {
-      var parsed = JSON.parse(routeEl.dataset.routes);
-      if (Array.isArray(parsed) && parsed.length) ROUTES = parsed;
-    }
-  } catch (e) {}
-
-
-  function applyCabinParallax(progress) {
-    if (!cabinMedia || reduceMotion) return;
-    var p = Math.max(0, Math.min(1, progress));
-    /* Subtle Ken Burns — media oversized via CSS inset; leave video looping */
-    var x = (p - 0.5) * -2.4; /* % */
-    var y = (p - 0.5) * 1.2;
-    var scale = 1.06 + p * 0.04;
-    cabinMedia.style.setProperty("--cabin-parallax-x", x.toFixed(3) + "%");
-    cabinMedia.style.setProperty("--cabin-parallax-y", y.toFixed(3) + "%");
-    cabinMedia.style.setProperty("--cabin-parallax-scale", scale.toFixed(4));
-  }
-
-  function setRoute(progress) {
-    var idx = Math.min(
-      ROUTES.length - 1,
-      Math.floor(progress * ROUTES.length)
-    );
-    if (progress >= 0.999) idx = ROUTES.length - 1;
-    if (routeEl && ROUTES[idx] && routeEl.textContent !== ROUTES[idx]) {
-      routeEl.textContent = ROUTES[idx];
-    }
-    if (noteEl && NOTES[idx] && noteEl.textContent !== NOTES[idx]) {
-      noteEl.textContent = NOTES[idx];
-    }
-    if (progressBar) {
-      progressBar.style.width = Math.round(progress * 100) + "%";
-    }
-  }
 
   function syncNavTheme() {
     if (!nav || !nav.classList.contains("is-on")) return;
-    var paper = document.querySelector(".spread-paper, .nota-band");
     var samples = document.elementsFromPoint
       ? document.elementsFromPoint(window.innerWidth / 2, 28)
       : [];
@@ -90,7 +41,6 @@
         break;
       }
     }
-    /* Fallback without elementsFromPoint */
     if (!samples.length) {
       var y = window.scrollY + 40;
       document.querySelectorAll(".spread-paper, .nota-band").forEach(function (sec) {
@@ -115,7 +65,19 @@
     syncNavTheme();
   }
 
-  /* ——— Reduced motion: skip film + scrub ——— */
+  /* Soft vitre drift — no #scroll-track / progress / route captions */
+  function applyLightParallax() {
+    if (!cabinMedia || !journey || reduceMotion) return;
+    var rect = journey.getBoundingClientRect();
+    var vh = window.innerHeight || 1;
+    var mid = rect.top + rect.height / 2;
+    var p = 1 - Math.max(0, Math.min(1, mid / vh));
+    var y = (p - 0.5) * 8; /* px */
+    cabinMedia.style.transform =
+      "translate3d(0," + y.toFixed(2) + "px,0) scale(1.02)";
+  }
+
+  /* ——— Reduced motion: skip film ——— */
   if (reduceMotion) {
     document.body.classList.add("is-reduced-motion");
     finishTitleCard();
@@ -123,7 +85,6 @@
       el.classList.add("is-in");
     });
     window.addEventListener("scroll", onScrollNav, { passive: true });
-    setRoute(0);
     return;
   }
 
@@ -161,7 +122,10 @@
         smoothWheel: true,
         syncTouch: false,
       });
-      lenis.on("scroll", onScrollNav);
+      lenis.on("scroll", function () {
+        onScrollNav();
+        applyLightParallax();
+      });
       document.documentElement.classList.add("lenis");
     } catch (e) {
       console.info("[Couchette animations] Lenis skipped", e);
@@ -169,7 +133,14 @@
     }
   }
   if (!lenis) {
-    window.addEventListener("scroll", onScrollNav, { passive: true });
+    window.addEventListener(
+      "scroll",
+      function () {
+        onScrollNav();
+        applyLightParallax();
+      },
+      { passive: true }
+    );
   }
 
   /* ——— No GSAP fallback ——— */
@@ -198,17 +169,7 @@
       });
     }
 
-    function crudeProgress() {
-      if (!track) return;
-      var rect = track.getBoundingClientRect();
-      var total = track.offsetHeight || 1;
-      var seen = -rect.top;
-      var p = Math.max(0, Math.min(1, seen / total));
-      applyCabinParallax(p);
-      setRoute(p);
-    }
-    window.addEventListener("scroll", crudeProgress, { passive: true });
-    crudeProgress();
+    applyLightParallax();
 
     if (lenis) {
       function rafLenis(time) {
@@ -256,35 +217,18 @@
     );
   });
 
-  /* Cabin media parallax + route scrub on sticky journey track */
-  var scrubAmt = isMobile ? 0.55 : 0.8;
-  if (track) {
+  /* Light vitre parallax — Composition 1 (no scrub track) */
+  if (journey && cabinMedia) {
     ScrollTrigger.create({
-      trigger: track,
-      start: "top top",
-      end: "bottom bottom",
-      scrub: scrubAmt,
-      onUpdate: function (self) {
-        var p = self.progress;
-        applyCabinParallax(p);
-        if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
-          window.COUCHETTE_TRAIN.setProgress(p);
-        }
-        setRoute(p);
+      trigger: journey,
+      start: "top bottom",
+      end: "bottom top",
+      scrub: 0.6,
+      onUpdate: function () {
+        applyLightParallax();
       },
     });
   }
 
-  /* Soft fade of captions while scrubbing */
-  var captions = document.querySelector(".journey-captions");
-  if (captions && track) {
-    ScrollTrigger.create({
-      trigger: track,
-      start: "top top",
-      end: "bottom bottom",
-      onUpdate: function () {
-        /* keep captions visible — no fade needed */
-      },
-    });
-  }
+  applyLightParallax();
 })();

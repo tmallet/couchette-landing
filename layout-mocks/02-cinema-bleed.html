@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Couchette — Layout mock · Cinéma bleed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1410;
+      --night: #080b10;
+      --paper: #f5f0e8;
+      --muted: rgba(245, 240, 232, 0.62);
+      --ember: #c45c2a;
+      --font-display: "Fraunces", Georgia, serif;
+      --font: "DM Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
+    body {
+      font-family: var(--font);
+      background: #050403;
+      color: var(--paper);
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: clamp(0.55rem, 1.4vw, 1rem);
+      display: grid;
+    }
+    .vitre {
+      position: relative;
+      border-radius: 3px;
+      overflow: hidden;
+      background: #0a0e18;
+      box-shadow:
+        0 0 0 1px rgba(255, 220, 180, 0.07),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+      min-height: calc(100vh - 2 * clamp(0.55rem, 1.4vw, 1rem));
+      min-height: calc(100dvh - 2 * clamp(0.55rem, 1.4vw, 1rem));
+    }
+    .media { position: absolute; inset: 0; }
+    .media video,
+    .media img {
+      position: absolute;
+      inset: -4%;
+      width: 108%;
+      height: 108%;
+      object-fit: cover;
+      display: block;
+    }
+    .media video { z-index: 1; }
+    .media img { z-index: 0; }
+    .grade {
+      position: absolute; inset: 0; z-index: 2; pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(8, 6, 4, 0.18) 0%, transparent 32%, rgba(8, 5, 3, 0.72) 100%),
+        linear-gradient(90deg, rgba(255, 158, 92, 0.06) 0%, transparent 45%, rgba(30, 50, 80, 0.12) 100%);
+    }
+    .grain {
+      position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0.2;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+      background-size: 180px 180px;
+    }
+    .caption {
+      position: absolute;
+      left: clamp(1.25rem, 4vw, 3rem);
+      right: clamp(1.25rem, 4vw, 3rem);
+      bottom: clamp(1.4rem, 4.5vh, 2.75rem);
+      z-index: 4;
+      max-width: 28rem;
+    }
+    .route {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .hook {
+      margin: 0.55rem 0 0;
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--muted);
+      max-width: 22rem;
+    }
+    .mock-tag {
+      position: fixed; top: 0.75rem; right: 0.85rem; z-index: 20;
+      font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(245,240,232,0.35); pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .media video { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <span class="mock-tag">Mock 01 · Cinéma bleed</span>
+  <main class="page">
+    <figure class="vitre" aria-label="Vitré cabine">
+      <div class="media">
+        <video muted playsinline loop autoplay preload="metadata" poster="../media/cabin-night-poster.jpg" aria-hidden="true">
+          <source src="../media/cabin-night.mp4" type="video/mp4" />
+        </video>
+        <img src="../media/cabin-night-poster.jpg" alt="" />
+      </div>
+      <div class="grade" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
+      <figcaption class="caption">
+        <p class="route">Paris → Vienne</p>
+        <p class="hook">Le paysage défile. Vous restez.</p>
+      </figcaption>
+    </figure>
+  </main>
+</body>
+</html>
