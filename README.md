@@ -87,7 +87,7 @@ Pas de date de lancement. Activation : voir `waitlist-setup.md`.
 
 ## Proto
 
-https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html
+https://tmallet.github.io/couchette-proto/
 
 ## Hors scope
 
