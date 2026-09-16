@@ -1,0 +1,17 @@
+Couchette landing — Option B interim cabin-glass media
+======================================================
+
+Files:
+  media/cabin-night-poster.jpg
+  media/cabin-night-loop.mp4
+  media/cabin-night-loop.webm
+
+Source: Pexels video https://www.pexels.com/video/15161525/
+License: Pexels License — free for commercial and personal use; attribution
+         not required (credited in footer). See https://www.pexels.com/license/
+Downloaded / prepared: 2026-09-16
+
+Notes:
+- Interim stock for .cabin-glass hero (poster + short night loop).
+- Replaceable by Kvicha final assets dropped into media/.
+- Replaces Quaternius Modular Train / Three.js WebGL canvas.

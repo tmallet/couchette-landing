@@ -38,10 +38,17 @@
         <div class="cabin-frame" aria-hidden="true">
           <div class="cabin-bevel">
             <div class="cabin-glass">
-              <div class="scene-stage" id="scene-stage">
-                <canvas id="train-canvas"></canvas>
-                <div class="scene-fallback" id="scene-fallback"></div>
+              <div class="cabin-media" id="cabin-media">
+                <video id="cabin-video" class="cabin-video" poster="media/cabin-night-poster.jpg" muted playsinline loop autoplay preload="metadata">
+                  <source src="media/cabin-night-loop.webm" type="video/webm" />
+                  <source src="media/cabin-night-loop.mp4" type="video/mp4" />
+                </video>
+                <img class="cabin-poster" id="cabin-poster" src="media/cabin-night-poster.jpg" alt="" />
+                <div class="film-grade" aria-hidden="true"></div>
+                <div class="film-grain" aria-hidden="true"></div>
               </div>
+              <div class="scene-fallback" id="scene-fallback" aria-hidden="true"></div>
+              <div class="glass-vignette" aria-hidden="true"></div>
               <div class="glass-reflect"></div>
               <div class="glass-dirt"></div>
             </div>
@@ -263,7 +270,7 @@
       Companion trains de nuit · Pas un OTA ·
       <a href="https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html" target="_blank" rel="noopener noreferrer">Prototype</a>
     </p>
-    <p class="footer-credit">Train 3D : Quaternius Modular Train Pack (CC0) — <code>models/</code></p>
+    <p class="footer-credit">Média vitre (interim) : nuit fenêtre — <a href="https://www.pexels.com/video/15161525/" target="_blank" rel="noopener noreferrer">Pexels</a> · <code>media/</code> · remplacé par Kvicha</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -271,15 +278,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
 
   <script src="config.js"></script>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
-    }
-  }
-  </script>
-  <script type="module" src="train3d.js"></script>
+  <script src="cabin-media.js"></script>
   <script src="animations.js"></script>
   <script src="app.js"></script>
 </body>

@@ -1,0 +1,115 @@
+/**
+ * Couchette — Option B cabin-glass media stub
+ * Poster + video loop inside .cabin-media; no WebGL / Quaternius.
+ * prefers-reduced-motion → poster only / pause.
+ */
+(function () {
+  "use strict";
+
+  var REDUCED_MQ = "(prefers-reduced-motion: reduce)";
+  var media = document.getElementById("cabin-media");
+  var video = document.getElementById("cabin-video");
+  var poster = document.getElementById("cabin-poster");
+  var fallback = document.getElementById("scene-fallback");
+
+  function prefersReduced() {
+    return window.matchMedia && window.matchMedia(REDUCED_MQ).matches;
+  }
+
+  function showPosterOnly() {
+    if (video) {
+      try {
+        video.pause();
+      } catch (e) {}
+      video.removeAttribute("autoplay");
+      video.classList.add("is-hidden");
+    }
+    if (poster) {
+      poster.classList.add("is-on");
+      poster.removeAttribute("hidden");
+    }
+    if (media) media.classList.add("is-ready", "is-poster-only");
+  }
+
+  function showFallback() {
+    showPosterOnly();
+    if (fallback) fallback.classList.add("is-on");
+    if (media) media.classList.add("is-error");
+  }
+
+  function markReady() {
+    if (media) media.classList.add("is-ready");
+    if (video) video.classList.add("is-ready");
+  }
+
+  function tryPlay() {
+    if (!video || prefersReduced()) return;
+    var p = video.play();
+    if (p && typeof p.then === "function") {
+      p.then(markReady).catch(function () {
+        /* Autoplay blocked — poster remains visible under / beside video */
+        if (poster) poster.classList.add("is-on");
+        markReady();
+      });
+    } else {
+      markReady();
+    }
+  }
+
+  if (!media) return;
+
+  if (prefersReduced()) {
+    document.body.classList.add("is-reduced-motion");
+    showPosterOnly();
+    return;
+  }
+
+  if (!video) {
+    showPosterOnly();
+    return;
+  }
+
+  video.addEventListener("loadeddata", markReady);
+  video.addEventListener("canplay", markReady);
+  video.addEventListener("error", showFallback);
+  var sources = video.querySelectorAll("source");
+  for (var i = 0; i < sources.length; i++) {
+    sources[i].addEventListener("error", function () {
+      /* Individual source failure — wait for video error or try next */
+    });
+  }
+
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(
+      function (entries) {
+        var vis = entries.some(function (e) {
+          return e.isIntersecting && e.intersectionRatio > 0.05;
+        });
+        if (vis) tryPlay();
+        else {
+          try {
+            video.pause();
+          } catch (e) {}
+        }
+      },
+      { threshold: [0, 0.05, 0.25] }
+    );
+    io.observe(media);
+  } else {
+    tryPlay();
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      try {
+        video.pause();
+      } catch (e) {}
+    } else if (!prefersReduced()) {
+      tryPlay();
+    }
+  });
+
+  /* Kick autoplay once metadata is there */
+  if (video.readyState >= 2) markReady();
+  tryPlay();
+})();

@@ -1,5 +1,5 @@
 /* Couchette landing v3 — rupture de layout (feedback ThiMal reskin)
-   Architecture: title card → vitre cabine (train IN glass) → travelling
+   Architecture: title card → vitre cabine (Option B media stub IN glass) → travelling
    sticky → spreads magazine papier/nuit → ticket waitlist.
    PAS: WebGL full-bleed hero, header SaaS, cards numérotées, form carte sombre. */
 
@@ -208,30 +208,83 @@ button, input, select { font: inherit; }
   color: rgba(245, 240, 232, 0.4);
 }
 
-/* Scene stage LIVES inside the glass — not fixed full-bleed */
-.scene-stage {
+/* Option B — cabin-media (poster + video) inside glass; no WebGL */
+.cabin-media {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
   background:
-    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(20, 45, 70, 0.5) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(20, 45, 70, 0.45) 0%, transparent 65%),
     linear-gradient(180deg, #060910 0%, #0a0e18 100%);
+  /* Parallax hooks — set by animations.js */
+  --cabin-parallax-x: 0%;
+  --cabin-parallax-y: 0%;
+  --cabin-parallax-scale: 1.06;
+  transform: translate3d(var(--cabin-parallax-x), var(--cabin-parallax-y), 0)
+    scale(var(--cabin-parallax-scale));
+  transform-origin: center center;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.85s var(--ease-out);
 }
-#train-canvas {
+.cabin-media.is-ready { opacity: 1; }
+
+.cabin-video,
+.cabin-poster {
+  position: absolute;
+  inset: -6%;
+  width: 112%;
+  height: 112%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+.cabin-video {
+  z-index: 1;
+}
+.cabin-video.is-hidden,
+.cabin-media.is-poster-only .cabin-video {
+  opacity: 0;
+  visibility: hidden;
+}
+.cabin-poster {
+  z-index: 0;
+  opacity: 1; /* under video as instant paint / fallback */
+}
+.cabin-media.is-poster-only .cabin-poster,
+.cabin-poster.is-on {
+  z-index: 1;
+  opacity: 1;
+}
+
+/* Film grade + grain over media */
+.film-grade {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  opacity: 0;
-  transition: opacity 0.9s var(--ease-out);
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(12, 8, 6, 0.28) 0%, transparent 28%, rgba(18, 10, 4, 0.38) 100%),
+    linear-gradient(90deg, rgba(255, 158, 92, 0.1) 0%, transparent 42%, rgba(40, 70, 110, 0.14) 100%);
+  mix-blend-mode: soft-light;
 }
-#train-canvas.is-ready { opacity: 1; }
+.film-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.24;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
 
 .scene-fallback {
   position: absolute;
   inset: 0;
+  z-index: 1;
   opacity: 0;
   pointer-events: none;
   background:
@@ -268,11 +321,46 @@ button, input, select { font: inherit; }
   to { transform: translateX(-30%); }
 }
 body.is-reduced-motion .scene-fallback::after { animation: none; }
+body.is-reduced-motion .cabin-media {
+  transform: none !important;
+  will-change: auto;
+  --cabin-parallax-x: 0%;
+  --cabin-parallax-y: 0%;
+  --cabin-parallax-scale: 1;
+}
+body.is-reduced-motion .cabin-video {
+  display: none !important;
+}
+body.is-reduced-motion .cabin-poster {
+  opacity: 1;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cabin-media {
+    transform: none !important;
+    will-change: auto;
+  }
+  .cabin-video {
+    display: none !important;
+  }
+  .cabin-poster {
+    opacity: 1;
+    z-index: 1;
+  }
+}
+
+.glass-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 70% at 50% 45%, transparent 40%, rgba(6, 4, 2, 0.55) 100%);
+}
 
 .glass-reflect {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 5;
   pointer-events: none;
   background:
     linear-gradient(115deg, rgba(255, 255, 255, 0.07) 0%, transparent 28%, transparent 72%, rgba(255, 255, 255, 0.03) 100%),
@@ -282,7 +370,7 @@ body.is-reduced-motion .scene-fallback::after { animation: none; }
 .glass-dirt {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 5;
   pointer-events: none;
   opacity: 0.25;
   background:
@@ -344,6 +432,10 @@ body.is-reduced-motion .scene-fallback::after { animation: none; }
 .spread-paper {
   background: var(--paper);
   color: var(--paper-ink);
+}
+.spread-paper + .spread-paper,
+.spread-night + .spread-night {
+  /* subtle seam */
 }
 .spread-night {
   background: var(--night);

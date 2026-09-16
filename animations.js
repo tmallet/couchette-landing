@@ -1,6 +1,6 @@
 /**
  * Couchette v3 — title card + vitre travelling + magazine reveals
- * Scrub #scroll-track → COUCHETTE_TRAIN.setProgress + route captions
+ * Scrub #scroll-track → route captions + subtle #cabin-media parallax
  * prefers-reduced-motion: skip Lenis / scrub / fancy reveals
  */
 (function () {
@@ -23,6 +23,8 @@
   var noteEl = document.getElementById("journey-note");
   var progressBar = document.getElementById("journey-progress-bar");
   var track = document.getElementById("scroll-track");
+  var cabinMedia = document.getElementById("cabin-media");
+  var cabinVideo = document.getElementById("cabin-video");
 
   var ROUTES = ["Paris → Strasbourg", "Strasbourg → Munich", "Munich → Vienne", "Vienne → Budapest"];
   var NOTES = [
@@ -38,6 +40,33 @@
       if (Array.isArray(parsed) && parsed.length) ROUTES = parsed;
     }
   } catch (e) {}
+
+
+  function applyCabinParallax(progress) {
+    if (!cabinMedia || reduceMotion) return;
+    var p = Math.max(0, Math.min(1, progress));
+    /* Subtle translate + scale — media is oversized via CSS inset */
+    var x = (p - 0.5) * -2.4; /* % */
+    var y = (p - 0.5) * 1.2;
+    var scale = 1.06 + p * 0.04;
+    cabinMedia.style.setProperty("--cabin-parallax-x", x.toFixed(3) + "%");
+    cabinMedia.style.setProperty("--cabin-parallax-y", y.toFixed(3) + "%");
+    cabinMedia.style.setProperty("--cabin-parallax-scale", scale.toFixed(4));
+    /* Optional soft scrub of loop time (no pause) */
+    if (
+      cabinVideo &&
+      !cabinVideo.classList.contains("is-hidden") &&
+      isFinite(cabinVideo.duration) &&
+      cabinVideo.duration > 0
+    ) {
+      try {
+        var t = (p * cabinVideo.duration * 0.85) % cabinVideo.duration;
+        if (Math.abs((cabinVideo.currentTime || 0) - t) > 0.35) {
+          cabinVideo.currentTime = t;
+        }
+      } catch (e) {}
+    }
+  }
 
   function setRoute(progress) {
     var idx = Math.min(
@@ -189,9 +218,7 @@
       var total = track.offsetHeight || 1;
       var seen = -rect.top;
       var p = Math.max(0, Math.min(1, seen / total));
-      if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
-        window.COUCHETTE_TRAIN.setProgress(p);
-      }
+      applyCabinParallax(p);
       setRoute(p);
     }
     window.addEventListener("scroll", crudeProgress, { passive: true });
@@ -243,7 +270,7 @@
     );
   });
 
-  /* Train scrub on sticky journey track */
+  /* Cabin media parallax + route scrub on sticky journey track */
   var scrubAmt = isMobile ? 0.55 : 0.8;
   if (track) {
     ScrollTrigger.create({
@@ -253,9 +280,7 @@
       scrub: scrubAmt,
       onUpdate: function (self) {
         var p = self.progress;
-        if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
-          window.COUCHETTE_TRAIN.setProgress(p);
-        }
+        applyCabinParallax(p);
         setRoute(p);
       },
     });
