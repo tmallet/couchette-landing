@@ -1,8 +1,7 @@
 /**
- * Couchette — scroll + reveal (GSAP ScrollTrigger + Lenis)
- * Wires #scroll-track progress → COUCHETTE_TRAIN.setProgress
+ * Couchette v3 — title card + vitre travelling + magazine reveals
+ * Scrub #scroll-track → COUCHETTE_TRAIN.setProgress + route captions
  * prefers-reduced-motion: skip Lenis / scrub / fancy reveals
- * Lenis: desktop-only (disabled on coarse pointer / small screens)
  */
 (function () {
   "use strict";
@@ -17,25 +16,125 @@
   var isMobile =
     window.matchMedia && window.matchMedia(MOBILE_MQ).matches;
 
-  var header = document.querySelector(".site-header");
+  var titleCard = document.getElementById("title-card");
+  var nav = document.getElementById("site-nav");
   var reveals = document.querySelectorAll("[data-reveal]");
+  var routeEl = document.getElementById("journey-route");
+  var noteEl = document.getElementById("journey-note");
+  var progressBar = document.getElementById("journey-progress-bar");
+  var track = document.getElementById("scroll-track");
 
-  function onScrollHeader() {
-    if (!header) return;
-    header.classList.toggle("is-scrolled", window.scrollY > 24);
+  var ROUTES = ["Paris → Strasbourg", "Strasbourg → Munich", "Munich → Vienne", "Vienne → Budapest"];
+  var NOTES = [
+    "Le paysage défile. Vous restez.",
+    "Les lumières de la ville s’effacent.",
+    "Couloir, couchette, silence.",
+    "À l’aube, une autre gare.",
+  ];
+
+  try {
+    if (routeEl && routeEl.dataset.routes) {
+      var parsed = JSON.parse(routeEl.dataset.routes);
+      if (Array.isArray(parsed) && parsed.length) ROUTES = parsed;
+    }
+  } catch (e) {}
+
+  function setRoute(progress) {
+    var idx = Math.min(
+      ROUTES.length - 1,
+      Math.floor(progress * ROUTES.length)
+    );
+    if (progress >= 0.999) idx = ROUTES.length - 1;
+    if (routeEl && ROUTES[idx] && routeEl.textContent !== ROUTES[idx]) {
+      routeEl.textContent = ROUTES[idx];
+    }
+    if (noteEl && NOTES[idx] && noteEl.textContent !== NOTES[idx]) {
+      noteEl.textContent = NOTES[idx];
+    }
+    if (progressBar) {
+      progressBar.style.width = Math.round(progress * 100) + "%";
+    }
   }
 
+  function syncNavTheme() {
+    if (!nav || !nav.classList.contains("is-on")) return;
+    var paper = document.querySelector(".spread-paper, .nota-band");
+    var samples = document.elementsFromPoint
+      ? document.elementsFromPoint(window.innerWidth / 2, 28)
+      : [];
+    var onPaper = false;
+    for (var i = 0; i < samples.length; i++) {
+      var el = samples[i];
+      if (
+        el.classList &&
+        (el.classList.contains("spread-paper") ||
+          el.classList.contains("nota-band") ||
+          (el.closest && (el.closest(".spread-paper") || el.closest(".nota-band"))))
+      ) {
+        onPaper = true;
+        break;
+      }
+    }
+    /* Fallback without elementsFromPoint */
+    if (!samples.length) {
+      var y = window.scrollY + 40;
+      document.querySelectorAll(".spread-paper, .nota-band").forEach(function (sec) {
+        var r = sec.getBoundingClientRect();
+        var top = r.top + window.scrollY;
+        if (y >= top && y <= top + r.height) onPaper = true;
+      });
+    }
+    nav.classList.toggle("is-paper", onPaper);
+  }
+
+  function finishTitleCard() {
+    if (titleCard) {
+      titleCard.classList.add("is-done");
+      titleCard.setAttribute("aria-hidden", "true");
+    }
+    if (nav) nav.classList.add("is-on");
+    syncNavTheme();
+  }
+
+  function onScrollNav() {
+    syncNavTheme();
+  }
+
+  /* ——— Reduced motion: skip film + scrub ——— */
   if (reduceMotion) {
     document.body.classList.add("is-reduced-motion");
+    finishTitleCard();
     reveals.forEach(function (el) {
       el.classList.add("is-in");
     });
-    onScrollHeader();
-    window.addEventListener("scroll", onScrollHeader, { passive: true });
+    window.addEventListener("scroll", onScrollNav, { passive: true });
+    setRoute(0);
     return;
   }
 
-  /* ——— Lenis soft scroll: desktop only (draft-3d / mobile perf) ——— */
+  /* ——— Title card cut ——— */
+  function playTitleCard(done) {
+    if (!titleCard || typeof gsap === "undefined") {
+      finishTitleCard();
+      if (done) done();
+      return;
+    }
+    var word = titleCard.querySelector(".title-card-word");
+    var line = titleCard.querySelector(".title-card-line");
+    var tl = gsap.timeline({
+      onComplete: function () {
+        finishTitleCard();
+        if (done) done();
+      },
+    });
+    gsap.set([word, line], { autoAlpha: 0, y: 16 });
+    tl.to(word, { autoAlpha: 1, y: 0, duration: 0.9, ease: "power3.out" }, 0.15)
+      .to(line, { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.45)
+      .to(titleCard, { autoAlpha: 0, duration: 0.55, ease: "power2.inOut" }, 1.85)
+      .set(titleCard, { display: "none" });
+  }
+
+  /* ——— Lenis desktop ——— */
   var lenis = null;
   if (typeof Lenis !== "undefined" && !isMobile) {
     try {
@@ -47,7 +146,7 @@
         smoothWheel: true,
         syncTouch: false,
       });
-      lenis.on("scroll", onScrollHeader);
+      lenis.on("scroll", onScrollNav);
       document.documentElement.classList.add("lenis");
     } catch (e) {
       console.info("[Couchette animations] Lenis skipped", e);
@@ -55,13 +154,12 @@
     }
   }
   if (!lenis) {
-    window.addEventListener("scroll", onScrollHeader, { passive: true });
+    window.addEventListener("scroll", onScrollNav, { passive: true });
   }
-  onScrollHeader();
 
-  /* ——— GSAP ——— */
+  /* ——— No GSAP fallback ——— */
   if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
-    /* Fallback: IntersectionObserver reveals + scroll progress without GSAP */
+    playTitleCard();
     if ("IntersectionObserver" in window) {
       var io = new IntersectionObserver(
         function (entries) {
@@ -74,7 +172,7 @@
             }
           });
         },
-        { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+        { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
       );
       reveals.forEach(function (el) {
         io.observe(el);
@@ -85,14 +183,16 @@
       });
     }
 
-    var track = document.getElementById("scroll-track");
     function crudeProgress() {
-      if (!track || !window.COUCHETTE_TRAIN) return;
+      if (!track) return;
       var rect = track.getBoundingClientRect();
-      var total = track.offsetHeight + window.innerHeight;
-      var seen = window.innerHeight - rect.top;
+      var total = track.offsetHeight || 1;
+      var seen = -rect.top;
       var p = Math.max(0, Math.min(1, seen / total));
-      window.COUCHETTE_TRAIN.setProgress(p);
+      if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
+        window.COUCHETTE_TRAIN.setProgress(p);
+      }
+      setRoute(p);
     }
     window.addEventListener("scroll", crudeProgress, { passive: true });
     crudeProgress();
@@ -117,35 +217,19 @@
     gsap.ticker.lagSmoothing(0);
   }
 
-  /* Hero entrance */
-  var heroTl = gsap.timeline({ defaults: { ease: "power3.out" } });
-  var heroEls = document.querySelectorAll(".hero [data-reveal]");
-  heroTl.fromTo(
-    heroEls,
-    { autoAlpha: 0, y: 36 },
-    {
-      autoAlpha: 1,
-      y: 0,
-      duration: 1,
-      stagger: 0.12,
-      clearProps: "transform",
-    },
-    0.15
-  );
-  heroEls.forEach(function (el) {
-    el.classList.add("is-in");
+  playTitleCard(function () {
+    ScrollTrigger.refresh();
   });
 
   /* Section reveals */
   gsap.utils.toArray("[data-reveal]").forEach(function (el) {
-    if (el.closest(".hero")) return;
     gsap.fromTo(
       el,
-      { autoAlpha: 0, y: 40 },
+      { autoAlpha: 0, y: 36 },
       {
         autoAlpha: 1,
         y: 0,
-        duration: 0.9,
+        duration: 0.95,
         ease: "power3.out",
         scrollTrigger: {
           trigger: el,
@@ -159,71 +243,34 @@
     );
   });
 
-  /* Editorial ideas stagger */
-  var cards = gsap.utils.toArray(".idea");
-  if (cards.length) {
-    ScrollTrigger.batch(cards, {
-      start: "top 90%",
-      onEnter: function (batch) {
-        gsap.to(batch, {
-          autoAlpha: 1,
-          y: 0,
-          stagger: 0.12,
-          duration: 0.8,
-          ease: "power3.out",
-          overwrite: true,
-        });
-      },
-    });
-  }
-
-  /* Train scrub: continuous journey hero → end of scroll-track */
-  var hero = document.getElementById("hero");
-  var track = document.getElementById("scroll-track");
-  var scrubAmt = isMobile ? 0.6 : 0.85;
-  if (hero && track) {
-    ScrollTrigger.create({
-      trigger: hero,
-      start: "top top",
-      endTrigger: track,
-      end: "bottom top",
-      scrub: scrubAmt,
-      onUpdate: function (self) {
-        if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
-          window.COUCHETTE_TRAIN.setProgress(self.progress);
-        }
-      },
-    });
-  } else if (track) {
+  /* Train scrub on sticky journey track */
+  var scrubAmt = isMobile ? 0.55 : 0.8;
+  if (track) {
     ScrollTrigger.create({
       trigger: track,
-      start: "top bottom",
-      end: "bottom top",
+      start: "top top",
+      end: "bottom bottom",
       scrub: scrubAmt,
       onUpdate: function (self) {
+        var p = self.progress;
         if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
-          window.COUCHETTE_TRAIN.setProgress(self.progress);
+          window.COUCHETTE_TRAIN.setProgress(p);
         }
+        setRoute(p);
       },
     });
   }
 
-  /* Soft parallax on waitlist panel */
-  var panel = document.querySelector(".waitlist-panel");
-  if (panel) {
-    gsap.fromTo(
-      panel,
-      { y: 40 },
-      {
-        y: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: panel,
-          start: "top 95%",
-          end: "top 55%",
-          scrub: true,
-        },
-      }
-    );
+  /* Soft fade of captions while scrubbing */
+  var captions = document.querySelector(".journey-captions");
+  if (captions && track) {
+    ScrollTrigger.create({
+      trigger: track,
+      start: "top top",
+      end: "bottom bottom",
+      onUpdate: function () {
+        /* keep captions visible — no fade needed */
+      },
+    });
   }
 })();
