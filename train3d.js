@@ -6,8 +6,8 @@
  * Kvicha: load with <script type="module" src="train3d.js"></script>
  * (see MERGE.md). Duplicate global three.min.js can stay or be removed.
  */
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js";
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js";
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 (function () {
   "use strict";
