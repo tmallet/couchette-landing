@@ -31,6 +31,7 @@
 html {
   scroll-behavior: auto;
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {
@@ -430,6 +431,17 @@ body.is-reduced-motion .cabin-poster {
   align-items: center;
   max-width: var(--max);
   margin-inline: auto;
+  width: 100%;
+}
+.spread-grid > *,
+.journey-page > * {
+  min-width: 0;
+}
+.spread-display,
+.spread-h2,
+.journey-display {
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 .spread-grid.reverse {
   grid-template-columns: minmax(0, 0.58fr) minmax(0, 0.42fr);
@@ -978,8 +990,14 @@ body.is-reduced-motion .cabin-poster {
 @media (max-width: 768px) {
   .spread-grid,
   .spread-grid.reverse {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2rem;
+    width: 100%;
+  }
+  .spread-col-text,
+  .spread-col-figure {
+    min-width: 0;
+    max-width: 100%;
   }
   .spread-grid.reverse .spread-col-text,
   .spread-grid.reverse .spread-col-figure {
