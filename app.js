@@ -38,7 +38,7 @@
     if (!submitBtn) return;
     submitBtn.disabled = busy;
     submitBtn.setAttribute("aria-busy", busy ? "true" : "false");
-    submitBtn.textContent = busy ? "Envoi…" : "Sois prévenu à l'ouverture";
+    submitBtn.textContent = busy ? "Envoi…" : "Sois prévenu quand Couchette s’ouvre";
   }
 
   function setStatus(msg, isError) {

@@ -1,7 +1,8 @@
-# Couchette — Landing waitlist (Cabin light)
+# Couchette — Landing waitlist (v3 rupture layout)
 
-Companion **trains de nuit Europe** — landing marketing FR immersive + capture waitlist.  
-**Direction :** Cabin light (cinéma nocturne européen) — go ThiMal 16 sep 2026.  
+Companion **trains de nuit Europe** — landing marketing FR + capture waitlist.  
+**v3 rupture layout — feedback ThiMal reskin** (16 sep 2026) : plus de hero WebGL full-bleed + cards SaaS ; architecture film / vitre / magazine / ticket.
+
 **Pas un OTA** : découvrir · comparer · préparer → deep-link opérateur.
 
 ## Live
@@ -18,41 +19,40 @@ python3 -m http.server 8787
 # → http://localhost:8787
 ```
 
-(FormSubmit nécessite http(s), pas `file://`.)
+(FormSubmit et les modules ES / GLB nécessitent http(s), pas `file://`.)
 
-## Direction Cabin light
+## Architecture v3 (rupture)
 
-- Mood : vitres, lueur couchette, paysage qui défile — pas luxe palace, pas SaaS, **pas** reskin proto (navy + `#d4a84b` chips).
-- Palette : encre `#05080f`, bleu nuit `#0a1628`, mid `#15232E`, ambre `#f0b46a` / glow `#FF9E5C` (rare), laiton `#c9a36a`, papier `#f5f0e8`.
-- Typo : **Fraunces** (display) + **DM Sans** (UI).
-- Parcours : hero immersif → scroll-scrub train 3D → promesse companion → 3 idées éditoriales → CTA waitlist → proto discret → note pas OTA.
+1. **Title card** plein écran (« Couchette » + une ligne) puis cut
+2. **Vitré cabine** : `#train-canvas` vit *dans* le cadre (bevel / reflet), pas en fond fixed
+3. **Travelling** sticky : scroll vertical → scrub `COUCHETTE_TRAIN.setProgress` + captions Paris→Vienne
+4. **Spreads magazine** : alternance papier chaud (`#f5f0e8` / `#ebe4d8`) et nuit, asymétrie 40/60, pull quotes — les 3 idées ne sont **pas** des cards
+5. **Waitlist ticket** perforé — CTA après le wow
+6. Nav minimale (wordmark + lien waitlist)
 
 ## Train 3D
 
-- Canvas `#train-canvas` + API `COUCHETTE_TRAIN.setProgress(t)` (GSAP ScrollTrigger scrub sur `#scroll-track`).
-- GLB sous **`models/`** : **Kenney Train Kit** CC0 (fallback — Poly Pizza / Quaternius Modular Train bloqué au download) :
-  - `loco.glb`, `wagon.glb`, `rail.glb` + `LICENSE-kenney.txt`
-  - Source : https://kenney.nl/assets/train-kit
-- `train3d.js` : loader GLTF en cours (parallèle Dembélé) ; API `setProgress` conservée. Procédural encore en place tant que le loader n’est pas branché.
-- Crédit footer : « Train 3D : Kenney Train Kit (CC0) ».
-- Fallback motion : `prefers-reduced-motion` ou WebGL KO → CSS night scene.
+- Canvas `#train-canvas` dans `.scene-stage` (intérieur vitre) + API `COUCHETTE_TRAIN.setProgress(t)`
+- Scrub GSAP ScrollTrigger sur `#scroll-track`
+- GLB Quaternius sous `models/` (CC0) — voir `MERGE.md`
+- Fallback CSS si WebGL / `prefers-reduced-motion`
 
 ## Perf / a11y
 
-- DPR cap + pause offscreen / tab hidden (voir `train3d.js`)
-- Lenis soft scroll — **desktop only**
-- `prefers-reduced-motion` → pas de scrub / Lenis / RAF 3D
+- DPR cap + pause offscreen / tab hidden (`train3d.js`)
+- Lenis — desktop only
+- `prefers-reduced-motion` → pas de title card animée / scrub / Lenis / RAF 3D
 
 ## Fichiers
 
 ```
-index.html      Structure + copy FR Cabin light
-styles.css      Tokens Cabin light + typo éditoriale
-train3d.js      Three.js + (GLB Quaternius / fallback procédural)
-animations.js   GSAP ScrollTrigger + Lenis + reveals
+index.html      Structure v3 (title card → vitre → magazine → ticket)
+styles.css      Layout rupture (papier/nuit, cadre vitre, ticket)
+train3d.js      Three.js + GLB (taille = vitre, pas viewport plein)
+animations.js   Title card + ScrollTrigger scrub + reveals
 config.js       FORM_ENDPOINT FormSubmit
 app.js          Validation + POST + confirmation
-models/         GLB Quaternius (loco + carriages)
+models/         GLB Quaternius
 waitlist-setup.md
 README.md
 ```
