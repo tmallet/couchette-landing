@@ -1,3 +1,13 @@
+/**
+ * Couchette waitlist form
+ * ------------------------------------------------
+ * DEMBÉLÉ / Luis — POST branch:
+ *   config.js → COUCHETTE_CONFIG.FORM_ENDPOINT (FormSubmit AJAX by default)
+ *   Fields    → email, country, intention (+ _subject, _template, _captcha)
+ *   Fallback  → localStorage key "couchette_waitlist" if network/CORS fails
+ *   Swap      → change FORM_ENDPOINT (Formspree / Formspark / custom API)
+ *   Docs      → waitlist-setup.md
+ */
 (function () {
   "use strict";
 
@@ -28,7 +38,7 @@
     if (!submitBtn) return;
     submitBtn.disabled = busy;
     submitBtn.setAttribute("aria-busy", busy ? "true" : "false");
-    submitBtn.textContent = busy ? "Envoi…" : "Rejoindre la waitlist";
+    submitBtn.textContent = busy ? "Envoi…" : "Sois prévenu à l'ouverture";
   }
 
   function setStatus(msg, isError) {
@@ -44,9 +54,7 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (raw) list = JSON.parse(raw) || [];
       if (!Array.isArray(list)) list = [];
-      list.push(
-        Object.assign({}, entry, { ts: new Date().toISOString() })
-      );
+      list.push(Object.assign({}, entry, { ts: new Date().toISOString() }));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     } catch (err) {
       /* private mode / quota — ignore */
@@ -127,7 +135,6 @@
 
     postToBackend(data)
       .then(function (result) {
-        /* FormSubmit returns success after activation; first hit may ask to activate. */
         var msg =
           (result.json && (result.json.message || result.json.success)) || "";
         var activated =
@@ -139,12 +146,9 @@
           showConfirm();
           return;
         }
-
-        /* Still show confirm — localStorage has the row; backend may need activation. */
         showConfirm();
       })
       .catch(function () {
-        /* Network / CORS / file:// — localStorage kept the capture for this browser. */
         showConfirm();
         setStatus(
           "Inscription enregistrée localement. Si c’est la 1ʳᵉ fois, activez FormSubmit via l’email reçu.",

@@ -1,6 +1,7 @@
-# Couchette — Landing waitlist (premium)
+# Couchette — Landing waitlist (Cabin light)
 
 Companion **trains de nuit Europe** — landing marketing FR immersive + capture waitlist.  
+**Direction :** Cabin light (cinéma nocturne européen) — go ThiMal 16 sep 2026.  
 **Pas un OTA** : découvrir · comparer · préparer → deep-link opérateur.
 
 ## Live
@@ -19,51 +20,47 @@ python3 -m http.server 8787
 
 (FormSubmit nécessite http(s), pas `file://`.)
 
-## Wow factor
+## Direction Cabin light
 
-- **Train 3D procédural** (Three.js CDN) : loco + wagons, fenêtres cabines chaudes, rails, fog nuit, étoiles
-- **Scroll-driven** : le train avance avec le scroll (`#scroll-track` + GSAP ScrollTrigger → `COUCHETTE_TRAIN.setProgress`)
-- **GSAP** reveals / hover cards / entrée hero
-- **Lenis** soft scroll — **desktop only** (désactivé sur coarse pointer / ≤768px)
-- **Fallback** : `prefers-reduced-motion` ou WebGL KO → CSS night scene (pas de boucle 3D)
+- Mood : vitres, lueur couchette, paysage qui défile — pas luxe palace, pas SaaS, **pas** reskin proto (navy + `#d4a84b` chips).
+- Palette : encre `#05080f`, bleu nuit `#0a1628`, mid `#15232E`, ambre `#f0b46a` / glow `#FF9E5C` (rare), laiton `#c9a36a`, papier `#f5f0e8`.
+- Typo : **Fraunces** (display) + **DM Sans** (UI).
+- Parcours : hero immersif → scroll-scrub train 3D → promesse companion → 3 idées éditoriales → CTA waitlist → proto discret → note pas OTA.
 
-## Perf / a11y (merged from draft-3d)
+## Train 3D
 
-- DPR cap (`1.25` mobile / `1.75` desktop) + `powerPreference: low-power` on mobile
-- Pause WebGL loop when canvas offscreen (`IntersectionObserver`) or tab hidden
-- `prefers-reduced-motion` → 2D CSS fallback, no Lenis / scrub / RAF
-- Safer dispose: geometries/materials, `forceContextLoss`, `pagehide`
+- Canvas `#train-canvas` + API `COUCHETTE_TRAIN.setProgress(t)` (GSAP ScrollTrigger scrub sur `#scroll-track`).
+- GLB sous **`models/`** : **Kenney Train Kit** CC0 (fallback — Poly Pizza / Quaternius Modular Train bloqué au download) :
+  - `loco.glb`, `wagon.glb`, `rail.glb` + `LICENSE-kenney.txt`
+  - Source : https://kenney.nl/assets/train-kit
+- `train3d.js` : loader GLTF en cours (parallèle Dembélé) ; API `setProgress` conservée. Procédural encore en place tant que le loader n’est pas branché.
+- Crédit footer : « Train 3D : Kenney Train Kit (CC0) ».
+- Fallback motion : `prefers-reduced-motion` ou WebGL KO → CSS night scene.
+
+## Perf / a11y
+
+- DPR cap + pause offscreen / tab hidden (voir `train3d.js`)
+- Lenis soft scroll — **desktop only**
+- `prefers-reduced-motion` → pas de scrub / Lenis / RAF 3D
 
 ## Fichiers
 
 ```
-index.html      Structure + copy FR + commentaires POST pour Dembélé
-styles.css      Tokens nuit / or, typo expressive, mobile-first
-train3d.js      Three.js procédural + DPR / pause / dispose
-animations.js   GSAP ScrollTrigger + Lenis desktop-only + reveals
+index.html      Structure + copy FR Cabin light
+styles.css      Tokens Cabin light + typo éditoriale
+train3d.js      Three.js + (GLB Quaternius / fallback procédural)
+animations.js   GSAP ScrollTrigger + Lenis + reveals
 config.js       FORM_ENDPOINT FormSubmit
-app.js          Validation + POST + confirmation + localStorage
+app.js          Validation + POST + confirmation
+models/         GLB Quaternius (loco + carriages)
 waitlist-setup.md
 README.md
 ```
 
-## Stack
-
-- HTML/CSS/JS vanilla — **pas** React / R3F / Vite obligatoire
-- Three.js + GSAP ScrollTrigger + Lenis via **CDN**
-- Train **procédural** (pas Spline)
-
 ## Waitlist (FormSubmit)
 
-Submissions POST → `config.js` (`email`, `country`, `intention`).  
-Activation one-shot : voir `waitlist-setup.md`.
-
-```bash
-curl -s -X POST https://formsubmit.co/ajax/thibaut3mallet@gmail.com \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"email":"activation-test@example.com","country":"FR","intention":"explore","_subject":"Couchette waitlist activation","_captcha":"false"}'
-```
+Champs inchangés : `email`, `country`, `intention` → `config.js`.  
+Pas de date de lancement. Activation : voir `waitlist-setup.md`.
 
 ## Proto
 
