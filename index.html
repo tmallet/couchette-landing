@@ -3,136 +3,195 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Couchette — companion mobile des trains de nuit en Europe. Découvrir, comparer, préparer une nuit. Rejoignez la waitlist." />
-  <meta name="theme-color" content="#070b14" />
+  <meta name="description" content="Couchette — companion des trains de nuit en Europe. Découvrir, comparer, préparer une nuit. Sois prévenu à l’ouverture." />
+  <meta name="theme-color" content="#1a1410" />
+  <meta property="og:title" content="Couchette — Trains de nuit en Europe" />
+  <meta property="og:description" content="Le companion multi-opérateurs pour découvrir et préparer votre nuit sur rails. Pas un OTA." />
   <title>Couchette — Trains de nuit en Europe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <a class="skip-link" href="#waitlist">Aller au formulaire waitlist</a>
 
-  <header class="site-header">
-    <div class="wrap">
-      <a class="brand" href="#">
-        <span class="brand-mark" aria-hidden="true"></span>
-        Couchette
-      </a>
-      <a class="header-link" href="https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html" target="_blank" rel="noopener noreferrer">
-        Voir le proto
-      </a>
+  <!-- 0. Ouverture film — title card plein écran, puis cut -->
+  <div class="title-card" id="title-card" role="presentation" aria-hidden="true">
+    <div class="title-card-inner">
+      <p class="title-card-word">Couchette</p>
+      <p class="title-card-line">Une nuit européenne, mieux préparée.</p>
     </div>
+  </div>
+
+  <!-- Nav minimale non-SaaS -->
+  <header class="site-nav" id="site-nav">
+    <a class="nav-wordmark" href="#">Couchette</a>
+    <a class="nav-waitlist" href="#waitlist">Waitlist</a>
   </header>
 
   <main>
-    <!-- 1. Hero -->
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="wrap">
-        <p class="hero-badge">Trains de nuit · Europe</p>
-        <h1 id="hero-title">Préparez votre nuit sur rails, avant de réserver</h1>
-        <p class="hero-lead">
-          <strong>Couchette</strong> est le companion mobile des trains de nuit&nbsp;:
-          découvrir les lignes, comparer les cabines, anticiper les ouvertures de ventes —
-          puis réserver chez l’opérateur.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#waitlist">Rejoindre la waitlist</a>
-          <a class="btn btn-ghost" href="https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html" target="_blank" rel="noopener noreferrer">
-            Voir le proto
-          </a>
+    <!-- 1. Métaphore fenêtre + travelling horizontal (sticky) -->
+    <section class="journey" id="journey" aria-label="Travelling cabine">
+      <div class="journey-sticky">
+        <div class="cabin-frame" aria-hidden="true">
+          <div class="cabin-bevel">
+            <div class="cabin-glass">
+              <div class="scene-stage" id="scene-stage">
+                <canvas id="train-canvas"></canvas>
+                <div class="scene-fallback" id="scene-fallback"></div>
+              </div>
+              <div class="glass-reflect"></div>
+              <div class="glass-dirt"></div>
+            </div>
+            <div class="cabin-sill">
+              <span class="sill-label">Vitré · nuit</span>
+            </div>
+          </div>
         </div>
-        <p class="hero-note">Pas une agence de voyage — un outil pour explorer la nuit européenne.</p>
+
+        <div class="journey-captions" aria-live="polite">
+          <p class="journey-kicker">Corridor nocturne</p>
+          <p class="journey-route" id="journey-route" data-routes='["Paris → Strasbourg","Strasbourg → Munich","Munich → Vienne","Vienne → Budapest"]'>Paris → Strasbourg</p>
+          <p class="journey-note" id="journey-note">Le paysage défile. Vous restez.</p>
+        </div>
+
+        <div class="journey-progress" aria-hidden="true">
+          <div class="journey-progress-bar" id="journey-progress-bar"></div>
+        </div>
       </div>
+      <!-- Hauteur de scrub : scroll vertical → progression train -->
+      <div class="journey-scrub" id="scroll-track" aria-hidden="true"></div>
     </section>
 
-    <!-- 2. Trois bénéfices -->
-    <section class="benefits" aria-labelledby="benefits-title">
-      <div class="wrap">
-        <p class="section-label">Ce que Couchette apporte</p>
-        <h2 class="section-title" id="benefits-title">Trois gestes pour une nuit mieux préparée</h2>
-        <div class="benefit-grid">
-          <article class="benefit-card">
-            <div class="benefit-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="9"/>
-                <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>
-              </svg>
-            </div>
-            <h3>Carte multi-opérateurs</h3>
-            <p>
-              Une vue claire des trains de nuit en Europe — Nightjet, European Sleeper et d’autres —
-              pour explorer sans jongler entre les sites.
-            </p>
-          </article>
-
-          <article class="benefit-card">
-            <div class="benefit-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="5" width="18" height="14" rx="2"/>
-                <path d="M3 10h18M8 14h3"/>
-              </svg>
-            </div>
-            <h3>Fiches cabines</h3>
-            <p>
-              Couchette, sleeper, compartiments : comparez le confort et le type de couchette
-              avant de choisir chez l’opérateur.
-            </p>
-          </article>
-
-          <article class="benefit-card">
-            <div class="benefit-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 3v2M12 19v2M5 12H3M21 12h-2M6.3 6.3l-1.4-1.4M19.1 19.1l-1.4-1.4M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/>
-                <circle cx="12" cy="12" r="4"/>
-              </svg>
-            </div>
-            <h3>Alertes &amp; pass Interrail / Eurail</h3>
-            <p>
-              Soyez prévenu à l’ouverture des ventes, et repérez les trajets compatibles
-              avec votre pass — sans promesse de place magique.
-            </p>
-          </article>
+    <!-- 2. Intro magazine (papier chaud) — promesse asymétrique -->
+    <section class="spread spread-paper" id="promise" aria-labelledby="promise-title">
+      <div class="spread-grid">
+        <div class="spread-col spread-col-text" data-reveal>
+          <p class="spread-label">Companion</p>
+          <h1 id="promise-title" class="spread-display">
+            La vitre,<br />
+            la lueur,<br />
+            <em>le paysage</em>
+          </h1>
+          <p class="spread-lead">
+            <strong>Couchette</strong> rassemble les trains de nuit européens
+            pour découvrir, comparer les cabines, anticiper les ouvertures —
+            puis réserver <em>chez l’opérateur</em>.
+          </p>
+          <p class="spread-aside">Pas un palace. Pas une agence. Deep-link, pas de panier Couchette.</p>
+        </div>
+        <div class="spread-col spread-col-figure" data-reveal aria-hidden="true">
+          <figure class="mag-figure mag-figure-night">
+            <span class="mag-figure-num">01</span>
+            <blockquote class="mag-pull">
+              «&nbsp;Une nuit mieux lue<br />avant le billet.&nbsp;»
+            </blockquote>
+            <figcaption>Promesse · Europe</figcaption>
+          </figure>
         </div>
       </div>
     </section>
 
-    <!-- Différences / positionnement -->
-    <section class="diff" aria-label="Positionnement">
-      <div class="wrap">
-        <div class="diff-inner">
-          <p class="diff-tag">Pas un OTA</p>
+    <!-- 3. Trois idées = spreads éditoriaux (alternance papier / nuit) -->
+    <section class="spread spread-night idea-spread" id="idea-map" aria-labelledby="idea-map-title">
+      <div class="spread-grid reverse">
+        <div class="spread-col spread-col-figure" data-reveal aria-hidden="true">
+          <div class="giant-num">01</div>
+          <div class="mag-map-visual">
+            <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+            <span class="line l1"></span><span class="line l2"></span>
+          </div>
+        </div>
+        <div class="spread-col spread-col-text" data-reveal>
+          <p class="spread-label">Carte</p>
+          <h2 id="idea-map-title" class="spread-h2">Multi-opérateurs,<br />une seule vue.</h2>
           <p>
-            Couchette <strong>ne vend pas de billets</strong>.
-            On vous aide à découvrir et préparer votre nuit&nbsp;;
-            la réservation se fait via <strong>deep-link chez l’opérateur</strong>.
+            Nightjet, European Sleeper et d’autres lignes —
+            rêver un trajet sans ouvrir dix onglets.
           </p>
         </div>
       </div>
     </section>
 
-    <!-- 4. Formulaire waitlist -->
-    <section class="waitlist" id="waitlist" aria-labelledby="waitlist-title">
-      <div class="wrap">
-        <div class="waitlist-panel">
-          <!-- Waitlist → FormSubmit via config.js + app.js -->
-          <div class="form-block" id="waitlist-form-block">
-            <h2 id="waitlist-title">Rejoindre la waitlist</h2>
-            <p class="sub">Dites-nous d’où vous partez et comment vous voyagez. On mesure l’intérêt — sans spam.</p>
+    <section class="spread spread-paper idea-spread" id="idea-cabin" aria-labelledby="idea-cabin-title">
+      <div class="spread-grid">
+        <div class="spread-col spread-col-text" data-reveal>
+          <p class="spread-label">Cabines</p>
+          <h2 id="idea-cabin-title" class="spread-h2">Fiches pour<br />comparer le lit.</h2>
+          <p>
+            Couchette, sleeper, compartiments&nbsp;:
+            type de lit et intimité avant de choisir chez l’opérateur.
+          </p>
+          <blockquote class="inline-pull">«&nbsp;Savoir où l’on dort<br />avant de cliquer.&nbsp;»</blockquote>
+        </div>
+        <div class="spread-col spread-col-figure" data-reveal aria-hidden="true">
+          <div class="giant-num ink">02</div>
+          <div class="cabin-sketch">
+            <div class="bunk top"></div>
+            <div class="bunk bot"></div>
+            <div class="window-mini"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <form id="waitlist-form" action="#" method="post" novalidate>
+    <section class="spread spread-night idea-spread" id="idea-open" aria-labelledby="idea-open-title">
+      <div class="spread-grid reverse">
+        <div class="spread-col spread-col-figure" data-reveal aria-hidden="true">
+          <div class="giant-num">03</div>
+          <p class="mag-stamp">Ouverture<br />des ventes</p>
+        </div>
+        <div class="spread-col spread-col-text" data-reveal>
+          <p class="spread-label">Alertes &amp; passes</p>
+          <h2 id="idea-open-title" class="spread-h2">Être prévenu<br />à temps.</h2>
+          <p>
+            Ouverture des ventes, trajets Interrail / Eurail —
+            sans promesse de place magique.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Note pas OTA + proto discret -->
+    <section class="nota-band" aria-label="Positionnement">
+      <div class="nota-inner" data-reveal>
+        <p class="nota-tag">Pas un OTA</p>
+        <p>
+          Couchette <strong>ne vend pas de billets</strong>.
+          On aide à découvrir et préparer&nbsp;;
+          la réservation se fait via <strong>deep-link chez l’opérateur</strong>.
+        </p>
+        <a class="nota-proto" href="https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html" target="_blank" rel="noopener noreferrer">
+          Prototype interactif <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 4. Waitlist ticket / coupon perforé — APRÈS le wow -->
+    <section class="waitlist" id="waitlist" aria-labelledby="waitlist-title">
+      <div class="ticket" data-reveal>
+        <div class="ticket-main" id="waitlist-form-block">
+          <div class="ticket-head">
+            <span class="ticket-from">WAITLIST</span>
+            <span class="ticket-to">COUCHETTE</span>
+          </div>
+          <h2 id="waitlist-title">Sois prévenu quand Couchette s’ouvre</h2>
+          <p class="ticket-sub">Email, pays, intention. On mesure l’intérêt — sans spam.</p>
+
+          <!--
+            DEMBÉLÉ / Luis — branchement POST waitlist
+            Endpoint : config.js → COUCHETTE_CONFIG.FORM_ENDPOINT
+            Payload  : { email, country, intention, _subject, _template, _captcha }
+            Voir     : waitlist-setup.md + README.md
+          -->
+          <form id="waitlist-form" action="#" method="post" novalidate>
+            <div class="ticket-fields">
               <div class="form-group">
                 <label for="email">Email <span class="req" aria-hidden="true">*</span></label>
-                <input
-                  class="form-control"
-                  type="email"
-                  id="email"
-                  name="email"
-                  autocomplete="email"
-                  inputmode="email"
-                  required
-                  placeholder="vous@exemple.com"
-                />
+                <input class="form-control" type="email" id="email" name="email" autocomplete="email" inputmode="email" required placeholder="vous@exemple.com" />
               </div>
-
               <div class="form-group">
                 <label for="country">Pays <span class="req" aria-hidden="true">*</span></label>
                 <select class="form-control" id="country" name="country" required>
@@ -146,60 +205,74 @@
                   <option value="autre">Autre</option>
                 </select>
               </div>
-
-              <fieldset class="form-group">
-                <legend style="font-size:0.8125rem;font-weight:600;color:var(--text-muted);margin-bottom:8px;">
-                  Votre intention <span class="req" aria-hidden="true">*</span>
-                </legend>
-                <div class="intent-options" role="radiogroup" aria-label="Intention de voyage">
-                  <div class="intent-option">
-                    <input type="radio" id="intent-explore" name="intention" value="explore" required />
-                    <label for="intent-explore">J’explore sur carte / je rêve</label>
-                  </div>
-                  <div class="intent-option">
-                    <input type="radio" id="intent-dest" name="intention" value="destination" />
-                    <label for="intent-dest">J’ai déjà une destination</label>
-                  </div>
-                </div>
-              </fieldset>
-
-              <button class="btn btn-primary form-submit" type="submit">
-                Rejoindre la waitlist
-              </button>
-              <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
-              <p class="form-fineprint">
-                Pas de date de lancement promise. Un email rare, uniquement si on avance.
-              </p>
-            </form>
-          </div>
-
-          <div class="confirm" id="waitlist-confirm" role="status" aria-live="polite">
-            <div class="confirm-icon" aria-hidden="true">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M5 13l4 4L19 7"/>
-              </svg>
             </div>
-            <h2>Merci — vous êtes sur la liste</h2>
-            <p>
-              On a bien noté votre intérêt. On reviendra vers vous quand il y aura
-              quelque chose de concret à partager. D’ici là, bonne nuit sur les rails.
-            </p>
+
+            <fieldset class="form-group intent-fieldset">
+              <legend>Votre intention <span class="req" aria-hidden="true">*</span></legend>
+              <div class="intent-options" role="radiogroup" aria-label="Intention de voyage">
+                <div class="intent-option">
+                  <input type="radio" id="intent-explore" name="intention" value="explore" required />
+                  <label for="intent-explore">
+                    <span class="intent-title">J’explore</span>
+                    <span class="intent-desc">Sur carte / je rêve</span>
+                  </label>
+                </div>
+                <div class="intent-option">
+                  <input type="radio" id="intent-dest" name="intention" value="destination" />
+                  <label for="intent-dest">
+                    <span class="intent-title">Destination</span>
+                    <span class="intent-desc">J’ai déjà un trajet</span>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+
+            <button class="btn-ticket" type="submit">Sois prévenu quand Couchette s’ouvre</button>
+            <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
+            <p class="form-fineprint">Pas de date de lancement. Un email rare, uniquement si on avance.</p>
+          </form>
+        </div>
+
+        <div class="ticket-perf" aria-hidden="true"></div>
+
+        <div class="ticket-stub">
+          <p class="stub-code">C·NIGHT</p>
+          <p class="stub-meta">EUROPE<br />NUIT</p>
+          <p class="stub-seat">—</p>
+        </div>
+
+        <div class="confirm" id="waitlist-confirm" role="status" aria-live="polite">
+          <div class="confirm-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 13l4 4L19 7"/>
+            </svg>
           </div>
+          <h2>Merci — vous êtes sur la liste</h2>
+          <p>
+            On a bien noté votre intérêt. On reviendra quand il y aura
+            quelque chose de concret. D’ici là, bonne nuit sur les rails.
+          </p>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="wrap">
-      <p>
-        Couchette · Companion trains de nuit ·
-        <a href="https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html" target="_blank" rel="noopener noreferrer">Prototype</a>
-      </p>
-    </div>
+    <p class="footer-brand">Couchette</p>
+    <p class="footer-meta">
+      Companion trains de nuit · Pas un OTA ·
+      <a href="https://cdn.jsdelivr.net/gh/tmallet/couchette-proto@main/index.html" target="_blank" rel="noopener noreferrer">Prototype</a>
+    </p>
+    <p class="footer-credit">Train 3D : Quaternius Modular Train Pack (CC0) — <code>models/</code></p>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
   <script src="config.js"></script>
+  <script type="module" src="train3d.js"></script>
+  <script src="animations.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
