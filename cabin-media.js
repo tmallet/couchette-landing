@@ -1,7 +1,8 @@
 /**
- * Couchette — Option B cabin-glass media stub
- * Poster + video loop inside .cabin-media; no WebGL / Quaternius.
- * prefers-reduced-motion → poster only / pause.
+ * Couchette — Option B cabin-glass editorial media
+ * Poster + video loop inside .cabin-media; no WebGL / Quaternius / GLB.
+ * Exposes window.COUCHETTE_TRAIN.setProgress for scroll scrub compat.
+ * prefers-reduced-motion → pause video, poster still.
  */
 (function () {
   "use strict";
@@ -11,6 +12,23 @@
   var video = document.getElementById("cabin-video");
   var poster = document.getElementById("cabin-poster");
   var fallback = document.getElementById("scene-fallback");
+
+  var targetProgress = 0;
+
+  window.COUCHETTE_TRAIN = {
+    progress: 0,
+    setProgress: function (t) {
+      targetProgress = Math.max(0, Math.min(1, Number(t) || 0));
+      window.COUCHETTE_TRAIN.progress = targetProgress;
+    },
+    destroy: function () {
+      if (video) {
+        try {
+          video.pause();
+        } catch (e) {}
+      }
+    },
+  };
 
   function prefersReduced() {
     return window.matchMedia && window.matchMedia(REDUCED_MQ).matches;
@@ -47,7 +65,6 @@
     var p = video.play();
     if (p && typeof p.then === "function") {
       p.then(markReady).catch(function () {
-        /* Autoplay blocked — poster remains visible under / beside video */
         if (poster) poster.classList.add("is-on");
         markReady();
       });
@@ -72,12 +89,6 @@
   video.addEventListener("loadeddata", markReady);
   video.addEventListener("canplay", markReady);
   video.addEventListener("error", showFallback);
-  var sources = video.querySelectorAll("source");
-  for (var i = 0; i < sources.length; i++) {
-    sources[i].addEventListener("error", function () {
-      /* Individual source failure — wait for video error or try next */
-    });
-  }
 
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(
@@ -109,7 +120,6 @@
     }
   });
 
-  /* Kick autoplay once metadata is there */
   if (video.readyState >= 2) markReady();
   tryPlay();
 })();

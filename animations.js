@@ -45,27 +45,13 @@
   function applyCabinParallax(progress) {
     if (!cabinMedia || reduceMotion) return;
     var p = Math.max(0, Math.min(1, progress));
-    /* Subtle translate + scale — media is oversized via CSS inset */
+    /* Subtle Ken Burns — media oversized via CSS inset; leave video looping */
     var x = (p - 0.5) * -2.4; /* % */
     var y = (p - 0.5) * 1.2;
     var scale = 1.06 + p * 0.04;
     cabinMedia.style.setProperty("--cabin-parallax-x", x.toFixed(3) + "%");
     cabinMedia.style.setProperty("--cabin-parallax-y", y.toFixed(3) + "%");
     cabinMedia.style.setProperty("--cabin-parallax-scale", scale.toFixed(4));
-    /* Optional soft scrub of loop time (no pause) */
-    if (
-      cabinVideo &&
-      !cabinVideo.classList.contains("is-hidden") &&
-      isFinite(cabinVideo.duration) &&
-      cabinVideo.duration > 0
-    ) {
-      try {
-        var t = (p * cabinVideo.duration * 0.85) % cabinVideo.duration;
-        if (Math.abs((cabinVideo.currentTime || 0) - t) > 0.35) {
-          cabinVideo.currentTime = t;
-        }
-      } catch (e) {}
-    }
   }
 
   function setRoute(progress) {
@@ -281,6 +267,9 @@
       onUpdate: function (self) {
         var p = self.progress;
         applyCabinParallax(p);
+        if (window.COUCHETTE_TRAIN && window.COUCHETTE_TRAIN.setProgress) {
+          window.COUCHETTE_TRAIN.setProgress(p);
+        }
         setRoute(p);
       },
     });
